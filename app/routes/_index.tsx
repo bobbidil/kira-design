@@ -9,6 +9,7 @@ import {
   redirect,
   useLoaderData,
 } from "react-router";
+import { createTransport } from "nodemailer";
 import {
   isLocalResource,
   loadResource,
@@ -218,19 +219,6 @@ export const action = async ({
 
     const formData = await request.formData();
 
-    const system = {
-      params: {},
-      search: {},
-      origin: url.origin,
-      pathname: url.pathname,
-    };
-
-    const resourceName = formData.get(formIdFieldName);
-    let resource =
-      typeof resourceName === "string"
-        ? getResources({ system }).action.get(resourceName)
-        : undefined;
-
     const formBotValue = formData.get(formBotFieldName);
 
     if (formBotValue == null || typeof formBotValue !== "string") {
@@ -238,10 +226,6 @@ export const action = async ({
     }
 
     const submitTime = parseInt(formBotValue, 16);
-    // Assumes that the difference between the server time and the form submission time,
-    // including any client-server time drift, is within a 5-minute range.
-    // Note: submitTime might be NaN because formBotValue can be any string used for logging purposes.
-    // Example: `formBotValue: jsdom`, or `formBotValue: headless-env`
     if (
       Number.isNaN(submitTime) ||
       Math.abs(Date.now() - submitTime) > 1000 * 60 * 5
@@ -249,34 +233,40 @@ export const action = async ({
       throw new Error(`Form bot value invalid ${formBotValue}`);
     }
 
-    formData.delete(formIdFieldName);
-    formData.delete(formBotFieldName);
+    // Extract form data, excluding bot fields
+    const data = Object.fromEntries(formData);
+    delete data[formIdFieldName];
+    delete data[formBotFieldName];
 
-    if (resource) {
-      resource.body = Object.fromEntries(formData);
-    } else {
-      if (contactEmail === undefined) {
-        throw new Error("Contact email not found");
-      }
+    // Configure nodemailer
+    // Assuming Gmail based on "MAIL_APP_PASSWORD" usage pattern, can be adjusted if needed
+    const transporter = createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_APP_PASSWORD,
+      },
+    });
 
-      resource = context.getDefaultActionResource?.({
-        url,
-        projectId,
-        contactEmail,
-        formData,
-      });
-    }
+    // Send email
+    await transporter.sendMail({
+      from: process.env.MAIL_USER,
+      to: process.env.MAIL_USER, // Send to self
+      subject: `New Form Submission: ${data.name || "Kira Design"}`,
+      text: Object.entries(data)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join("\n"),
+      html: `
+        <h1>New Form Submission</h1>
+        ${Object.entries(data)
+          .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`)
+          .join("")}
+      `,
+    });
 
-    if (resource === undefined) {
-      throw Error("Resource not found");
-    }
-    const { ok, statusText } = await loadResource(fetch, resource);
-    if (ok) {
-      return { success: true };
-    }
-    return { success: false, errors: [statusText] };
+    return { success: true };
   } catch (error) {
-    console.error(error);
+    console.error("Form submission error:", error);
 
     return {
       success: false,
