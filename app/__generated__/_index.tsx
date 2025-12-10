@@ -592,7 +592,7 @@ const Page = (_props: { system: any; }) => {
         <Link
           href={"/workshop-example"}
           target={"_self"}
-          scroll={"true"}
+
           className={`w-element ${"scrape-gallery-item"}`}>
           <div
             className={`w-element ${"scrape-gallery-caption"}`}>
@@ -933,7 +933,7 @@ const Page = (_props: { system: any; }) => {
               <div
                 className={`w-element ${"scrape-accordion-item"}`}>
                 <div
-                  onclick={"toggleScrapeAccordion(this)"}
+                  onClick={(e) => (window as any).toggleScrapeAccordion(e.currentTarget)}
                   className={`w-element c14y1bup ${"scrape-accordion-btn"}`}>
                   <h3
                     className={`w-element ${"scrape-accordion-title"}`}>
@@ -991,7 +991,7 @@ const Page = (_props: { system: any; }) => {
               <div
                 className={`w-element c14y1bup ${"scrape-accordion-item"}`}>
                 <div
-                  onclick={"toggleScrapeAccordion(this)"}
+                  onClick={(e) => (window as any).toggleScrapeAccordion(e.currentTarget)}
                   className={`w-element ${"scrape-accordion-btn"}`}>
                   <h3
                     className={`w-element ${"scrape-accordion-title"}`}>

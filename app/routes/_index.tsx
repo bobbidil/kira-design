@@ -296,73 +296,7 @@ export const links: LinksFunction = () => {
 const getRequestHost = (request: Request): string =>
   request.headers.get("x-forwarded-host") || request.headers.get("host") || "";
 
-export const action = async ({
-  request,
-  context,
-}: ActionFunctionArgs): Promise<
-  { success: true } | { success: false; errors: string[] }
-> => {
-  try {
-    const url = new URL(request.url);
-    url.host = getRequestHost(request);
 
-    const formData = await request.formData();
-
-    const formBotValue = formData.get(formBotFieldName);
-
-    if (formBotValue == null || typeof formBotValue !== "string") {
-      throw new Error("Form bot field not found");
-    }
-
-    const submitTime = parseInt(formBotValue, 16);
-    if (
-      Number.isNaN(submitTime) ||
-      Math.abs(Date.now() - submitTime) > 1000 * 60 * 5
-    ) {
-      throw new Error(`Form bot value invalid ${formBotValue}`);
-    }
-
-    // Extract form data, excluding bot fields
-    const data = Object.fromEntries(formData);
-    delete data[formIdFieldName];
-    delete data[formBotFieldName];
-
-    // Configure nodemailer
-    // Assuming Gmail based on "MAIL_APP_PASSWORD" usage pattern, can be adjusted if needed
-    const transporter = createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_APP_PASSWORD,
-      },
-    });
-
-    // Send email
-    await transporter.sendMail({
-      from: process.env.MAIL_USER,
-      to: process.env.MAIL_USER, // Send to self
-      subject: `New Form Submission: ${data.name || "Kira Design"}`,
-      text: Object.entries(data)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join("\n"),
-      html: `
-        <h1>New Form Submission</h1>
-        ${Object.entries(data)
-          .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`)
-          .join("")}
-      `,
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Form submission error:", error);
-
-    return {
-      success: false,
-      errors: [error instanceof Error ? error.message : "Unknown error"],
-    };
-  }
-};
 
 const Outlet = () => {
   const { system, resources, url, pageMeta, host } =

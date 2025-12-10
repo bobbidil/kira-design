@@ -3,7 +3,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "react-router build",
+    "build": "npx react-router build",
     "dev": "react-router dev",
     "typecheck": "tsc",
     "deploy": "npx vercel deploy"
