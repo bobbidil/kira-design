@@ -117,9 +117,9 @@
     }
   },
   "reactRouterConfig": {
-    "appDirectory": "E:/Landing pages/kira-designs/app",
+    "appDirectory": "./app",
     "basename": "/",
-    "buildDirectory": "E:/Landing pages/kira-designs/build",
+    "buildDirectory": "./build",
     "future": {
       "unstable_optimizeDeps": false,
       "unstable_subResourceIntegrity": false,
