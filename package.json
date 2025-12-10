@@ -3,8 +3,8 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "npx react-router build",
-    "dev": "react-router dev",
+    "build": "vite build",
+    "dev": "vite",
     "typecheck": "tsc",
     "deploy": "npx vercel deploy"
   },
