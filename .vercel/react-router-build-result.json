@@ -117,9 +117,9 @@
     }
   },
   "reactRouterConfig": {
-    "appDirectory": "./app",
+    "appDirectory": "/vercel/path0/app",
     "basename": "/",
-    "buildDirectory": "./build",
+    "buildDirectory": "/vercel/path0/build",
     "future": {
       "unstable_optimizeDeps": false,
       "unstable_subResourceIntegrity": false,
