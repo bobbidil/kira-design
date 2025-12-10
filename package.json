@@ -5,8 +5,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "typecheck": "tsc",
-    "deploy": "npx vercel deploy"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@react-router/dev": "^7.5.3",
